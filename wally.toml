@@ -1,0 +1,21 @@
+[package]
+name = "naxtrodaumus/hmg"
+version = "0.1.0"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+
+# Terminal command to generate types for the wally packages;
+# rojo sourcemap default.project.json --output sourcemap.json
+# wally-package-types --sourcemap sourcemap.json Packages
+
+[dependencies]
+Syscore = "naxious/syscore@1.0.1" # https://naxious.github.io/naxdocs/api/Syscore
+Observer = "naxious/observer@2.0.0" # https://naxious.github.io/naxdocs/api/Observer
+Springer = "naxious/springer@1.0.2" # https://naxious.github.io/naxdocs/api/Springer
+Promise = "lukadev-0/typed-promise@4.0.2" # https://github.com/lukadev-0/rbx-typed-promise | https://eryn.io/roblox-lua-promise/
+React = "jsdotlua/react@17.2.1" # https://react.luau.page/api-reference/react/
+ReactRoblox = "jsdotlua/react-roblox@17.2.1" # https://react.luau.page/api-reference/react-roblox/
+ReactSpring = "chriscerie/react-spring@2.0.0" # https://www.chrisc.dev/roact-spring/docs/Common/configs
+UiLabs = "pepeeltoro41/ui-labs@2.4.0" # https://ui-labs.luau.page/docs/installation
+
+[server-dependencies]

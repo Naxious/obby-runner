@@ -1,0 +1,17 @@
+# Roblox
+*.rbxlx
+*.rbxl
+*.rbxlx.lock
+*.rbxl.lock
+
+# Wally Packages
+/Packages
+/ServerPackages
+
+# MacOS file metadata
+*.DS_Store
+
+*.lock
+
+# Luau LSP
+sourcemap.json
