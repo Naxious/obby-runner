@@ -1,0 +1,3 @@
+local TrailService = {}
+
+return TrailService

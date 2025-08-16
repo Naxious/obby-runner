@@ -3,7 +3,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
-local ProfileStore = require(ServerScriptService.PlayerData.ProfileStore)
+local ProfileStore = require(ServerScriptService.Systems.PlayerData.ProfileStore)
 local ProfileSchema = require(script.Parent.ProfileSchema)
 
 local playerStore = ProfileStore.New("PlayerStore", ProfileSchema)

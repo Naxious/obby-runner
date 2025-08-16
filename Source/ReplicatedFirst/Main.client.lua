@@ -7,6 +7,6 @@ if not game:IsLoaded() then
 	game.Loaded:Wait()
 end
 
-Syscore.AddFolderOfModules(ReplicatedFirst.IControllers)
 Syscore.AddFolderOfModules(ReplicatedFirst.Systems)
+Syscore.AddFolderOfModules(ReplicatedFirst.IControllers)
 Syscore.Start()
