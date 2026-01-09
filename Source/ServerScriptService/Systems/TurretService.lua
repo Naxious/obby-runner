@@ -18,7 +18,6 @@ type turret = Model & {
 }
 
 local TURRET_MOTOR_SPEED = 35
-local TURRET_LERP = 0.2
 
 local YAW_SPEED = math.rad(TURRET_MOTOR_SPEED)
 local YAW_MIN = math.rad(-65) -- right limit
@@ -55,10 +54,13 @@ function TurretService:FireTurret(player, turret: turret)
 		return
 	end
 
-	local aim = turret.Barrel.Attachment.WorldCFrame.LookVector
-	local origin = turret.Barrel.Attachment.WorldPosition
+	local yaw = turret:GetAttribute("Yaw")
+	local pitch = turret:GetAttribute("Pitch")
+	local originalPivot = turret:GetAttribute("Pivot")
 
-	Dropper:TurretFire(aim, origin)
+	local newBasePivot = originalPivot * CFrame.Angles(0, yaw, pitch)
+
+	Dropper:TurretFire(-newBasePivot.RightVector, newBasePivot.Position + -newBasePivot.RightVector * 12, player, seat)
 end
 
 function TurretService:AddTurret(turret: turret)
@@ -87,27 +89,21 @@ function TurretService:AddTurret(turret: turret)
 	local pitch = 0
 
 	local basePivot = base:GetPivot()
+	turret:SetAttribute("Pivot", basePivot)
 
 	motor.C0 = CFrame.new(0, 0, 0)
 
 	local turretData = {}
 
-	turretData["SeatConnection"] = seat.Changed:Connect(function()
-		-- Handle seat changes here
-	end)
-
-	turretData["AimConnection"] = RunService.Stepped:Connect(function(_, deltaTime: number)
+	turretData["AimConnection"] = RunService.Heartbeat:Connect(function(deltaTime, _deltaTime: number)
 		yaw += -seat.Steer * YAW_SPEED * deltaTime
 		yaw = math.clamp(yaw, YAW_MIN, YAW_MAX)
 
 		pitch += seat.Throttle * PITCH_SPEED * deltaTime
 		pitch = math.clamp(pitch, PITCH_MIN, PITCH_MAX)
 
-		local newBasePivot = base:GetPivot():Lerp(basePivot * CFrame.Angles(0, yaw, 0), TURRET_LERP)
-		base:PivotTo(newBasePivot)
-
-		local newMotorC1 = motor.C1:Lerp(CFrame.Angles(0, 0, pitch), TURRET_LERP)
-		motor.C1 = newMotorC1
+		turret:SetAttribute("Yaw", yaw)
+		turret:SetAttribute("Pitch", pitch)
 	end)
 
 	activeTurrets[turret] = turretData

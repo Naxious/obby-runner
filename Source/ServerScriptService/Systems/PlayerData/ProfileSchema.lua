@@ -7,13 +7,14 @@ local ProfileSchema = {
 		cups = 0,
 		coins = 0,
 		hearts = 0,
+		trails = {},
+		equippedTrail = "",
 	},
 	Lifetime = {
 		cups = 0,
 		coins = 0,
 		hearts = 0,
-	}
+	},
 }
 
 return ProfileSchema
- 

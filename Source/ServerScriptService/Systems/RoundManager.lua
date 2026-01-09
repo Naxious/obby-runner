@@ -11,11 +11,11 @@ type GameState = {
 	duration: number,
 }
 
-local GAME_SPEED_SCALE = 0.5
+local GAME_SPEED_SCALE = 1
 
 local TIME_INTERMISSION = 20 * GAME_SPEED_SCALE
 local TIME_VOTING = 15 * GAME_SPEED_SCALE
-local TIME_ROUND = 90 * GAME_SPEED_SCALE
+local TIME_ROUND = 120 * GAME_SPEED_SCALE
 
 local Timer = require(ReplicatedStorage.Libraries.Timer)
 
@@ -59,7 +59,11 @@ end
 
 function RoundManager:StartRound()
 	print("Round started!")
-	GameRound:Start()
+	local gameStarted = GameRound:Start()
+	if not gameStarted then
+		RoundManager:ForceIntermission()
+		return
+	end
 end
 
 function RoundManager:UpdateState()

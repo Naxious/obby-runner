@@ -4,6 +4,7 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local React = require(ReplicatedStorage.Packages.React)
 local Root = require(ReplicatedFirst.Modules.Root)
 local SidebarLeft = require(ReplicatedFirst.Interface.SidebarLeft)
+local InventoryController = require(ReplicatedFirst.IControllers.InventoryController)
 
 local Network = require(ReplicatedStorage.Network)
 
@@ -16,9 +17,10 @@ local function buttonPressed(buttonName)
 	if buttonName == "AFK" then
 		isAFK = not isAFK
 		Network.toggleAFK:FireServer(isAFK)
+	elseif buttonName == "Inventory" then
+		InventoryController:Toggle()
 	end
 
-	print(`AFK is ${tostring(isAFK)}`)
 	render()
 end
 

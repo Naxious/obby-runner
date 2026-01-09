@@ -99,6 +99,4 @@ function Ragdoll:EndRagdoll(character)
 	Network.ragdoll:FireClient(player, { state = "Stop" })
 end
 
-function Ragdoll:Init() end
-
 return Ragdoll

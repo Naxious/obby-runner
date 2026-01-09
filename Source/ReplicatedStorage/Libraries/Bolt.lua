@@ -5,12 +5,12 @@ local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local VERSION = "1.0.0"
+local VERSION = "1.1.0"
 local MESSAGE_SIZE_LIMIT = 100_000 -- bytes
 local F32_WARNING = true -- warn if f32 number is being serialized outside of it's exactly representable range
 
-if RunService:IsServer() then
-	warn(`⚡ v{VERSION}`)
+if RunService:IsServer() and RunService:IsStudio() then
+	print(`âš¡ v{VERSION}`)
 end
 
 export type BufferReader = {
@@ -138,6 +138,34 @@ export type Queue<T> = {
 	peek: (queue: Queue<T>) -> T,
 	isEmpty: (queue: Queue<T>) -> boolean,
 }
+
+function deepFreezeValue<T>(v: T): T
+	if typeof(v) == "table" then
+		table.freeze(v)
+		for _, value: any in v do
+			if typeof(value) == "table" then
+				deepFreezeValue(value)
+			end
+		end
+	end
+
+	return v
+end
+
+function cloneValue<T>(v: T): T
+	if typeof(v) == "table" then
+		local newTbl = table.clone(v)
+		for key: any, value: any in v do
+			if typeof(value) == "table" then
+				newTbl[key] = cloneValue(value)
+			end
+		end
+
+		return (newTbl :: any) :: T
+	end
+
+	return v
+end
 
 function areValuesEqual<A, B>(source: A, other: B)
 	if typeof(source) ~= "table" or typeof(other) ~= "table" then
@@ -1443,7 +1471,7 @@ function Bolt.RemoteProperty<T>(
 
 	local function triggerObservers()
 		for _, callback in observers do
-			callback(masterValue)
+			callback(cloneValue(masterValue))
 		end
 	end
 
@@ -1454,6 +1482,7 @@ function Bolt.RemoteProperty<T>(
 			end
 
 			masterValue = value
+
 			triggerObservers()
 		end)
 		propertyEvent:FireServer()
@@ -1471,7 +1500,7 @@ function Bolt.RemoteProperty<T>(
 		Observe = function(_self: RemoteProperty<T>, callback: (value: T) -> ())
 			table.insert(observers, callback)
 
-			callback(masterValue)
+			callback(cloneValue(masterValue))
 
 			return function()
 				local callbackIndex = table.find(observers, callback)
@@ -1483,10 +1512,10 @@ function Bolt.RemoteProperty<T>(
 			end
 		end,
 		Get = function(_self: RemoteProperty<T>)
-			return masterValue
+			return cloneValue(masterValue)
 		end,
 		GetFor = function(_self: RemoteProperty<T>, player: Player): T
-			return targetValue[player] ~= nil and targetValue[player] or masterValue
+			return cloneValue(targetValue[player] ~= nil and targetValue[player] or masterValue)
 		end,
 		Set = function(_self: RemoteProperty<T>, newValue: T)
 			assert(IS_SERVER, "Cannot set a remote property value from client side")
@@ -1495,7 +1524,9 @@ function Bolt.RemoteProperty<T>(
 				return
 			end
 
-			masterValue = newValue
+			masterValue = cloneValue(newValue)
+			deepFreezeValue(masterValue)
+
 			targetValue = {}
 
 			propertyEvent:FireAllClients(masterValue)
@@ -1514,9 +1545,12 @@ function Bolt.RemoteProperty<T>(
 				return
 			end
 
-			targetValue[player] = newValue
+			local newValueClone = cloneValue(newValue)
+			deepFreezeValue(newValueClone)
 
-			propertyEvent:FireClient(player, newValue == nil and masterValue or newValue)
+			targetValue[player] = newValueClone
+
+			propertyEvent:FireClient(player, newValueClone == nil and masterValue or newValueClone)
 		end,
 		ClearFor = function(_self: RemoteProperty<T>, player: Player)
 			assert(IS_SERVER, "Cannot set a remote property value from client side")

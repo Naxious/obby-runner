@@ -48,7 +48,7 @@ function Mapper:UnloadMap()
 	end
 end
 
-function Mapper:LoadMap(mapName: string)
+function Mapper:LoadMap(mapName: string): boolean
 	local knownMap = KNOWN_MAPS[mapName]
 	if not knownMap then
 		if workspace:FindFirstChild(mapName) then
@@ -56,13 +56,13 @@ function Mapper:LoadMap(mapName: string)
 			knownMap = workspace:FindFirstChild(mapName)
 		else
 			warn(`Map "{mapName}" is not known.`)
-			return
+			return false
 		end
 	end
 
 	if loadingMap then
 		warn(`Map loading in progress. Please wait.`)
-		return
+		return false
 	end
 	loadingMap = true
 
@@ -85,6 +85,7 @@ function Mapper:LoadMap(mapName: string)
 
 	print(`Map loaded: {mapName}`)
 	loadingMap = false
+	return true
 end
 
 function Mapper:Init()

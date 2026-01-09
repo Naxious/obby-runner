@@ -16,9 +16,24 @@ function SidebarLeft(props: props)
 		buttonName = "AFK",
 
 		Text = "AFK",
-		BackgroundColor3 = props.afk and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0),
+		TextColor3 = Color3.fromRGB(255, 255, 255),
+		TextStrokeColor3 = Color3.fromRGB(130, 130, 130),
+		BackgroundColor3 = props.afk and Color3.fromRGB(22, 131, 51) or Color3.fromRGB(131, 0, 0),
 		Size = UDim2.fromScale(0.8, 0.1),
 		Position = UDim2.fromScale(0.5, 0.5),
+		rounded = UDim.new(0, 0),
+	})
+
+	local inventoryButton = React.createElement(GenericButton, {
+		buttonPressed = props.buttonPressed,
+		buttonName = "Inventory",
+
+		Text = "Inventory",
+		BackgroundColor3 = Color3.fromRGB(22, 131, 51),
+		Size = UDim2.fromScale(0.8, 0.1),
+		Position = UDim2.fromScale(0.5, 0.38),
+		Image = "rbxassetid://129289889496378",
+		rounded = UDim.new(0, 0),
 	})
 
 	return React.createElement("Frame", {
@@ -30,7 +45,11 @@ function SidebarLeft(props: props)
 		uICorner = React.createElement("UICorner", {
 			CornerRadius = UDim.new(0.2, 0),
 		}),
+		uiAspectRatioConstraint = React.createElement("UIAspectRatioConstraint", {
+			AspectRatio = 0.14,
+		}),
 		afkButton = afkButton,
+		inventoryButton = inventoryButton,
 	})
 end
 

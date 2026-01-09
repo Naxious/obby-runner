@@ -35,9 +35,12 @@ local dropperCheckCount = 0
 local dropCheckCount = 0
 local playerDebounces = {} :: { [Player]: boolean }
 
-local Dropper = {}
+local Dropper = {
+	runnerHit = Instance.new("BindableEvent"),
+	shooterHit = Instance.new("BindableEvent"),
+}
 
-function Dropper:TurretFire(aim: Vector3, origin: Vector3)
+function Dropper:TurretFire(aim: Vector3, origin: Vector3, player: Player, parent)
 	local drop = Dropper:CreateDrop({
 		lookVector = aim,
 		position = origin,
@@ -46,13 +49,26 @@ function Dropper:TurretFire(aim: Vector3, origin: Vector3)
 		maxFrequency = 5,
 		dropName = "Ball",
 		lastDropped = 0,
-	})
+	}, player.UserId)
 
-	drop.Parent = workspace
-	drop.BALL:ApplyImpulse(aim * 10000)
-	-- task.defer(function()
-	-- 	drop.BALL:ApplyImpulse(aim * 10000)
-	-- end)
+	drop.Parent = parent.Parent
+	local ball = drop.BALL :: BasePart
+	for _, child in drop:GetChildren() do
+		if child:IsA("BasePart") then
+			child.Transparency = 1
+		end
+	end
+	ball:ApplyImpulse(aim * 10000)
+
+	for _, child in drop:GetChildren() do
+		if child:IsA("BasePart") then
+			if child.Name == "BALL" then
+				child.Transparency = 1
+			else
+				child.Transparency = 0
+			end
+		end
+	end
 end
 
 function Dropper:DropHitPlayer(drop: BasePart, player: Player)
@@ -60,7 +76,7 @@ function Dropper:DropHitPlayer(drop: BasePart, player: Player)
 	if not character then
 		return
 	end
-	print(`Drop {drop.Name} hit player {player.Name}`)
+
 	local dropName = drop.Name
 	if dropName == "Ball" then
 		Ragdoll:StartRagdoll(character, 1.5)
@@ -69,6 +85,24 @@ function Dropper:DropHitPlayer(drop: BasePart, player: Player)
 	else
 		warn(`Dropper: Drop "{dropName}" does not have a defined effect on players.`)
 	end
+
+	Dropper.runnerHit:Fire(player)
+	-- TODO: Add Hit tally to player.. (3 hits, and they lose unless spending a heart)
+
+	local ownerId = drop:GetAttribute("owner")
+	if not ownerId or ownerId == player.UserId then
+		return
+	end
+
+	local ownerPlayer = Players:GetPlayerByUserId(ownerId)
+	if not ownerPlayer then
+		return
+	end
+
+	Dropper.shooterHit:Fire(ownerPlayer)
+
+	-- TODO: Implement owner-specific effects
+	-- check if owner is a shooter.. add score
 end
 
 function Dropper:RemoveDrop(drop: BasePart)
@@ -119,12 +153,16 @@ function Dropper:UpdateDrops(deltaTime: number)
 	end
 end
 
-function Dropper:CreateDrop(dropperData: DropperData)
+function Dropper:CreateDrop(dropperData: DropperData, owner: number?)
 	local dropPosition = dropperData.position
 	local drop = ReplicatedStorage.Assets.SpawnParts:FindFirstChild(dropperData.dropName):Clone()
 	drop:PivotTo(CFrame.new(dropPosition))
 
 	CollisionManager:AddModelToCollisionGroup(drop, CollisionManager.CollisionGroups.drop)
+
+	if owner then
+		drop:SetAttribute("owner", owner)
+	end
 
 	local ball = drop:FindFirstChild("BALL")
 	if not ball then

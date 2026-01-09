@@ -1,8 +1,8 @@
 local placeHolder = "rbxassetid://10653378249"
 
 local Maps = {
-	["Lava Run"] = {
-		Name = "Lava Run",
+	["Snow Mountain"] = {
+		Name = "Snow Mountain",
 		Image = placeHolder,
 	},
 	["Death Maze"] = {
@@ -13,16 +13,12 @@ local Maps = {
 		Name = "Green Acres",
 		Image = placeHolder,
 	},
-	["District 9"] = {
-		Name = "District 9",
+	["Lava Run"] = {
+		Name = "Lava Run",
 		Image = placeHolder,
 	},
 	["Sandy Shores"] = {
 		Name = "Sandy Shores",
-		Image = placeHolder,
-	},
-	["Desert Dash"] = {
-		Name = "Desert Dash",
 		Image = placeHolder,
 	},
 }
